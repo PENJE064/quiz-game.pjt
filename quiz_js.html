@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>퀴즈 게임</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f6f7;
+            text-align: center;
+        }
+        .quiz-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .question {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .options label {
+            display: block;
+            padding: 5px;
+            cursor: pointer;
+        }
+        .btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #03c75a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background: #029e49;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container" id="quiz-container">
+        <h2>퀴즈 게임</h2>
+        <div id="quiz"></div>
+        <button class="btn" onclick="checkAnswers()">답 체크</button>
+        <p id="result"></p>
+    </div>
+    
+    <script>
+        const questions = [
+            { q: "웹 사이트를 구축할 때 주로 사용하는 파일 타입이 아닌 것은?", options: [".html", ".exe", ".js", ".css"], answer: "b" },
+            { q: "자바스크립트 객체는 어떤 문자로 래핑되는가?", options: ["[]", "; ;", "{}", "()"], answer: "c" },
+            { q: "십진수 45를 이진수로 바꾸면?", options: ["101101", "110011", "011101", "101011"], answer: "a" }
+        ];
+        
+        const quizContainer = document.getElementById("quiz");
+        
+        questions.forEach((item, index) => {
+            const questionBlock = document.createElement("div");
+            questionBlock.classList.add("question-block");
+            
+            questionBlock.innerHTML = `
+                <div class='question'>${index + 1}. ${item.q}</div>
+                <div class='options'>
+                    ${item.options.map((option, i) => `
+                        <label>
+                            <input type='radio' name='question${index}' value='${String.fromCharCode(97 + i)}'> ${option}
+                        </label>
+                    `).join('')}
+                </div>
+                <p class='error' id='error${index}'></p>
+            `;
+            quizContainer.appendChild(questionBlock);
+        });
+        
+        function checkAnswers() {
+            let score = 0;
+            let allAnswered = true;
+            
+            questions.forEach((item, index) => {
+                const selected = document.querySelector(`input[name='question${index}']:checked`);
+                const errorMsg = document.getElementById(`error${index}`);
+                
+                if (!selected) {
+                    errorMsg.textContent = "문제를 풀어주세요!";
+                    allAnswered = false;
+                } else {
+                    errorMsg.textContent = "";
+                    if (selected.value === item.answer) {
+                        score++;
+                    }
+                }
+            });
+            
+            if (allAnswered) {
+                if (score === questions.length) {
+                    document.body.innerHTML = `
+                        <div class='quiz-container'>
+                            <h2>축하합니다! 모든 문제를 맞췄습니다! 🎉</h2>
+                            <p>당신은 퀴즈 마스터입니다!</p>
+                            <button class='btn' onclick='location.reload()'>다시 도전</button>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById("result").textContent = `총 점수: ${score} / ${questions.length}`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
